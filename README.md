@@ -28,7 +28,7 @@ CN3
  4  RX    -> host TX
 ```
 
-The USB serial link was built from a spare ESP8266 (ideaspark board, CH340). The first approach bridged UART0 to a bit-banged SoftwareSerial port, which dropped bytes under load. The reliable method turned out to need no firmware at all: the ESP is held in reset (`RST` to `GND`) so it tristates its pins, and the router is wired straight to the onboard CH340 on GPIO1/GPIO3, turning the board into a plain USB to TTL adapter with a lossless hardware UART.
+The USB serial link was built from a spare ESP8266 (ideaspark board, CH340). The ESP runs a small SoftwareSerial bridge sketch: the router's TX/RX are wired to GPIO4/GPIO5, and the sketch forwards bytes in both directions between that soft UART and the hardware UART0 that reaches the PC over the onboard CH340. It works, but SoftwareSerial bit-bangs the line in software, so at 115200 full-duplex it drops bytes during bursts (boot spew, dumping a file) even with an enlarged RX buffer.
 
 ```
 tio -b 115200 /dev/ttyUSB1
